@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 
 import QUESTIONS from "../questions.js";
-import QuestionTimer from "./QuestionTimer.jsx";
 import quizCompleteImg from "../assets/quiz-complete.png";
 
 function Quiz() {
-  const [userAnswers, setUsersAnswers] = useState([]);
+  const [userAnswers, setUserAnswers] = useState([]);
 
-  // po każdym wybraniu odpowiedzi array z odpowiedziami zwieksza sie w handleSelectAnswer
-  const activeQuestionIndex = userAnswers.length;
-  const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+  const activeQuestionIndex = userAnswers.length; // const zwieksza sie przy kazdej dodane odpowiedzi
+  const quizIsComplete = activeQuestionIndex === QUESTIONS.length; // sprawdza czy odpowiedzielismy na wszystkie pytania
 
   function handleSelectAnswer(selectedAnswer) {
-    setUsersAnswers((prevUsersAnswers) => {
-      return [...prevUsersAnswers, selectedAnswer];
+    setUserAnswers((prevUserAnswers) => {
+      return [...prevUserAnswers, selectedAnswer];
     });
   }
 
@@ -27,22 +26,22 @@ function Quiz() {
   }
 
   const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
-  shuffledAnswers.sort(() => Math.random() - 0.5);
+  shuffledAnswers.sort(() => Math.random() - 0.5); //mieszamy odpowiedzi
 
   return (
     <div id="quiz">
       <div id="question">
-        <QuestionTimer
-          timeout={10000}
-          onTimeout={() => {
-            handleSelectAnswer(null);
-          }}
-        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {shuffledAnswers.map((answer) => (
-            <li key={answer} data-item={answer} className="answer">
-              <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
+            <li key={answer} className="answer">
+              <button
+                onClick={() => {
+                  handleSelectAnswer(answer);
+                }}
+              >
+                {answer}
+              </button>
             </li>
           ))}
         </ul>

@@ -5,7 +5,7 @@ import logoImg from "../assets/quiz-logo.png";
 function Header() {
   return (
     <header>
-      <img src={logoImg} alt="Quiz logo" />
+      <img src={logoImg} alt="imgLogo" />
       <h1>ReactQuiz</h1>
     </header>
   );
