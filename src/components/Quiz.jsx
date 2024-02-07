@@ -1,20 +1,40 @@
 import React from "react";
-import { useState } from "react";
-
+import { useState, useCallback } from "react";
+// useCallback zapobiega ponownegmu renderowaniu komponentu we wskazanych momentach
 import QUESTIONS from "../questions.js";
+import Question from "./Question.jsx";
 import quizCompleteImg from "../assets/quiz-complete.png";
 
 function Quiz() {
+  const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
 
-  const activeQuestionIndex = userAnswers.length; // const zwieksza sie przy kazdej dodane odpowiedzi
+  const activeQuestionIndex = answerState === "" ? userAnswers.length : userAnswers.length - 1; // const zwieksza sie przy kazdej dodanej odpowiedzi
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length; // sprawdza czy odpowiedzielismy na wszystkie pytania
 
-  function handleSelectAnswer(selectedAnswer) {
-    setUserAnswers((prevUserAnswers) => {
-      return [...prevUserAnswers, selectedAnswer];
-    });
-  }
+  const handleSelectAnswer = useCallback(
+    function handleSelectAnswer(selectedAnswer) {
+      setAnswerState("answered");
+      setUserAnswers((prevUserAnswers) => {
+        return [...prevUserAnswers, selectedAnswer];
+      });
+
+      setTimeout(() => {
+        if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+          setAnswerState("correct");
+        } else {
+          setAnswerState("wrong");
+        }
+
+        setTimeout(() => {
+          setAnswerState("");
+        }, 1000 * 2);
+      }, 1000);
+    },
+    [activeQuestionIndex]
+  );
+
+  const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer]);
 
   if (quizIsComplete) {
     return (
@@ -25,27 +45,9 @@ function Quiz() {
     );
   }
 
-  const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
-  shuffledAnswers.sort(() => Math.random() - 0.5); //mieszamy odpowiedzi
-
   return (
     <div id="quiz">
-      <div id="question">
-        <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-        <ul id="answers">
-          {shuffledAnswers.map((answer) => (
-            <li key={answer} className="answer">
-              <button
-                onClick={() => {
-                  handleSelectAnswer(answer);
-                }}
-              >
-                {answer}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Question key={activeQuestionIndex} questionText={QUESTIONS[activeQuestionIndex].text} answers={QUESTIONS[activeQuestionIndex].answers} answerState={answerState} selectedAnswer={userAnswers[userAnswers.length - 1]} onSelectAnswer={handleSelectAnswer} onSkipAnswer={handleSkipAnswer} />
     </div>
   );
 }
